@@ -61,10 +61,10 @@
 		<module>openbp-common</module>
 		<module>openbp-core</module>
 		<module>openbp-server</module>
-		<module>openbp-server-hib</module>
-		<module>openbp-server-cay</module>
-		<!-- <module>openbp-server-jms</module> -->
-		<module>openbp-syncmodel</module>
+		<!-- <module>openbp-server-hib</module>
+		<module>openbp-server-cay</module> -->
+		<!-- <module>openbp-server-jms</module>
+		<module>openbp-syncmodel</module> -->
 		<module>openbp-model-system</module>
 		<module>openbp-model-testm1</module>
 		<module>openbp-model-testm2</module>

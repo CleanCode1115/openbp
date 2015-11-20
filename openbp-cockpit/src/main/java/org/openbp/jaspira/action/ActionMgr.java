@@ -58,17 +58,19 @@ public final class ActionMgr
 	}
 
 	/**
-	 * Returns the singleton instance of the ActionMgr.
-	 * @return The ActionMgr, is created if necessary
+	 * Removes all actions in the given collection to the manager.
+	 *
+	 * @param actions A collection containing the actions to remove
 	 */
-	public static synchronized ActionMgr getInstance()
+	public void removeAllActions(Collection actions)
 	{
-		if (singleton == null)
+		if (actions != null)
 		{
-			singleton = new ActionMgr();
+			for (Iterator it = actions.iterator(); it.hasNext();)
+			{
+				removeAction((JaspiraAction) it.next());
+			}
 		}
-
-		return singleton;
 	}
 
 	/////////////////////////////////////////////////////////////////////////
@@ -76,56 +78,15 @@ public final class ActionMgr
 	/////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Add a new Action to the manager. Returns true if the action is already
-	 * existant. If the action is already registered, it is NOT replaced.
-	 * @param action the action to add
+	 * Removes a JaspiraAction from the manager. Returns the removed action or
+	 * null if an action with the given name is not existant.
+	 *
+	 * @param action The action to be removed
+	 * @return The removed action or null if the action was not registered
 	 */
-	public void addAction(JaspiraAction action)
+	public JaspiraAction removeAction(JaspiraAction action)
 	{
-		registerActionIfNotYetRegistered(action);
-		JaspiraAction registeredAction = getRegisteredAction(action);
-		registeredAction.increaseCounter();
-
-		addChildToMenuParentIfGiven(registeredAction);
-		addToToolbarParentIfGiven(registeredAction);
-	}
-
-	private JaspiraAction getRegisteredAction(JaspiraAction action) {
-		JaspiraAction actionToAdd = getAction(action.getName());
-		return actionToAdd;
-	}
-
-	private void addToToolbarParentIfGiven(JaspiraAction action) {
-		String toolbarparentname = action.getActionPropertyString(JaspiraAction.PROPERTY_TOOLBAR_PARENT);
-
-		if (toolbarparentname == null) return;
-		
-		JaspiraAction toolbarparent = getOrCreateParentAction(action, toolbarparentname);
-		toolbarparent.addToolbarChild(action);
-	}
-
-	private JaspiraAction getOrCreateParentAction(JaspiraAction current, String toolbarparentname) {
-		JaspiraAction toolbarparent = getAction(toolbarparentname);
-		if (toolbarparent != null) return toolbarparent;
-	
-		toolbarparent = new JaspiraAction(current.getActionResource(), toolbarparentname);
-		addAction(toolbarparent);
-		
-		return toolbarparent;
-	}
-
-	private void addChildToMenuParentIfGiven(JaspiraAction current) {
-		String menuparentname = current.getActionPropertyString(JaspiraAction.PROPERTY_MENU_PARENT);
-		if (menuparentname == null) return;
-		
-		JaspiraAction menuparent = getOrCreateParentAction(current, menuparentname);
-		menuparent.addMenuChild(current);
-	}
-
-	private void registerActionIfNotYetRegistered(JaspiraAction action) {
-		String name = action.getName();
-		if (!actions.containsKey(name)) 
-			actions.put(name, action);
+		return removeAction(action.getName());
 	}
 
 	/**
@@ -153,47 +114,18 @@ public final class ActionMgr
 	}
 
 	/**
-	 * Removes a JaspiraAction from the manager. Returns the removed action or
-	 * null if an action with the given name is not existant.
-	 *
-	 * @param action The action to be removed
-	 * @return The removed action or null if the action was not registered
+	 * Returns the singleton instance of the ActionMgr.
+	 * @return The ActionMgr, is created if necessary
 	 */
-	public JaspiraAction removeAction(JaspiraAction action)
+	public static synchronized ActionMgr getInstance()
 	{
-		return removeAction(action.getName());
-	}
-
-	/**
-	 * Removes all actions in the given collection to the manager.
-	 *
-	 * @param actions A collection containing the actions to remove
-	 */
-	public void removeAllActions(Collection actions)
-	{
-		if (actions != null)
+		if (singleton == null)
 		{
-			for (Iterator it = actions.iterator(); it.hasNext();)
-			{
-				removeAction((JaspiraAction) it.next());
-			}
+			singleton = new ActionMgr();
 		}
-	}
 
-	/**
-	 * Returns the action with the given name or null if their is no such
-	 * action.
-	 * @param name The name (id) of the action to retrieve
-	 * @return The action or null if no such action exists
-	 */
-	public JaspiraAction getAction(String name)
-	{
-		return (JaspiraAction) actions.get(name);
+		return singleton;
 	}
-
-	//////////////////////////////////////////////////
-	// @@ Static methods
-	//////////////////////////////////////////////////
 
 	/**
 	 * Returns the mnemonic char of a string.
@@ -232,5 +164,73 @@ public final class ActionMgr
 		}
 
 		return s.substring(0, mnemonicpos) + s.substring(mnemonicpos + 1);
+	}
+
+	/**
+	 * Add a new Action to the manager. Returns true if the action is already
+	 * existant. If the action is already registered, it is NOT replaced.
+	 * @param action the action to add
+	 */
+	public void addAction(JaspiraAction action)
+	{
+		registerActionIfNotYetRegistered(action);
+		JaspiraAction registeredAction = getRegisteredAction(action);
+		registeredAction.increaseCounter();
+
+		addChildToMenuParentIfGiven(registeredAction);
+		addToToolbarParentIfGiven(registeredAction);
+	}
+
+	private void addChildToMenuParentIfGiven(JaspiraAction current) {
+		String menuparentname = current.getActionPropertyString(JaspiraAction.PROPERTY_MENU_PARENT);
+		if (menuparentname == null) return;
+		
+		JaspiraAction menuparent = getOrCreateParentAction(current, menuparentname);
+		menuparent.addMenuChild(current);
+	}
+
+	private void registerActionIfNotYetRegistered(JaspiraAction action) {
+		String name = action.getName();
+		if (!actions.containsKey(name)) 
+			actions.put(name, action);
+	}
+
+	private JaspiraAction getRegisteredAction(JaspiraAction action) {
+		JaspiraAction actionToAdd = getAction(action.getName());
+		return actionToAdd;
+	}
+
+	private void addToToolbarParentIfGiven(JaspiraAction action) {
+		String toolbarparentname = action.getActionPropertyString(JaspiraAction.PROPERTY_TOOLBAR_PARENT);
+
+		if (toolbarparentname == null) return;
+		
+		JaspiraAction toolbarparent = getOrCreateParentAction(action, toolbarparentname);
+		toolbarparent.addToolbarChild(action);
+	}
+
+	//////////////////////////////////////////////////
+	// @@ Static methods
+	//////////////////////////////////////////////////
+
+	private JaspiraAction getOrCreateParentAction(JaspiraAction current, String toolbarparentname) {
+		JaspiraAction toolbarparent = getAction(toolbarparentname);
+		if (toolbarparent != null) return toolbarparent;
+	
+		toolbarparent = new JaspiraAction(current.getActionResource(), toolbarparentname);
+		addAction(toolbarparent);
+		
+		return toolbarparent;
+	}
+
+	/**
+	 * Returns the action with the given name or null if their is no such
+	 * action.
+	 * @param name The name (id) of the action to retrieve
+	 * @return The action or null if no such action exists
+	 */
+	public JaspiraAction getAction(String name)
+	{
+		return (JaspiraAction) actions.get(name);
 	}
 }

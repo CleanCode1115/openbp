@@ -75,7 +75,7 @@ public class ProcessServer extends CoreModule
 	private List services;
 
 	/** Service implementations part 2 */
-	private List services2;
+	private List advancedServices;
 
 	/** Service registry */
 	private final MappingRegistry serviceRegistry;
@@ -152,7 +152,7 @@ public class ProcessServer extends CoreModule
 		initModels();
 
 		// Initializes advanced of the system
-		initServices(services2);
+		initServices(advancedServices);
 
 		// Register a shutdown hook that allows correct database shutdown
 		registerShutdownHook();
@@ -161,7 +161,7 @@ public class ProcessServer extends CoreModule
 		initRemoting();
 
 		initialized = true;
-	}
+	} 
 
 	/**
 	 * Registers implementations of the specified OpenBP service interfaces in the common registry.
@@ -370,7 +370,7 @@ public class ProcessServer extends CoreModule
 						}
 					}
 
-					shutdownServices(services2);
+					shutdownServices(advancedServices);
 
 					shutdownPersistence();
 
@@ -601,7 +601,7 @@ public class ProcessServer extends CoreModule
 	 */
 	public List getServices2()
 	{
-		return services2;
+		return advancedServices;
 	}
 
 	/**
@@ -610,7 +610,7 @@ public class ProcessServer extends CoreModule
 	 */
 	public void setServices2(List services2)
 	{
-		this.services2 = services2;
+		this.advancedServices = services2;
 	}
 
 	/**
@@ -627,7 +627,7 @@ public class ProcessServer extends CoreModule
 			if (serviceClass.isInstance(s))
 				return s;
 		}
-		for (Iterator it2 = CollectionUtil.iterator(services2); it2.hasNext();)
+		for (Iterator it2 = CollectionUtil.iterator(advancedServices); it2.hasNext();)
 		{
 			Object s = it2.next();
 			if (serviceClass.isInstance(s))
