@@ -100,30 +100,26 @@ public final class ActionMgr
 
 		if (toolbarparentname == null) return;
 		
-		JaspiraAction toolbarparent = getOrCreateToolbarParent(action, toolbarparentname);
+		JaspiraAction toolbarparent = getOrCreateParentAction(action, toolbarparentname);
 		toolbarparent.addToolbarChild(action);
 	}
 
-	private JaspiraAction getOrCreateToolbarParent(JaspiraAction current, String toolbarparentname) {
+	private JaspiraAction getOrCreateParentAction(JaspiraAction current, String toolbarparentname) {
 		JaspiraAction toolbarparent = getAction(toolbarparentname);
-		if (toolbarparent == null)
-		{
-			// No, create it on the fly
-			toolbarparent = new JaspiraAction(current.getActionResource(), toolbarparentname);
-			addAction(toolbarparent);
-		}
+		if (toolbarparent != null) return toolbarparent;
+	
+		toolbarparent = new JaspiraAction(current.getActionResource(), toolbarparentname);
+		addAction(toolbarparent);
+		
 		return toolbarparent;
 	}
 
 	private void addChildToMenuParentIfGiven(JaspiraAction current) {
 		String menuparentname = current.getActionPropertyString(JaspiraAction.PROPERTY_MENU_PARENT);
-		if (menuparentname != null)
-		{
-			JaspiraAction menuparent = getOrCreateToolbarParent(current, menuparentname);
-
-			// register this action at its parent
-			menuparent.addMenuChild(current);
-		}
+		if (menuparentname == null) return;
+		
+		JaspiraAction menuparent = getOrCreateParentAction(current, menuparentname);
+		menuparent.addMenuChild(current);
 	}
 
 	private void registerActionIfNotYetRegistered(JaspiraAction action) {
