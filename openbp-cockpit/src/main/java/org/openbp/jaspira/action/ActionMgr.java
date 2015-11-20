@@ -82,52 +82,54 @@ public final class ActionMgr
 	 */
 	public void addAction(JaspiraAction action)
 	{
-		String name = action.getName();
+		registerActionIfNotYetRegistered(action);
+		JaspiraAction registeredAction = getRegisteredAction(action);
+		registeredAction.increaseCounter();
 
-		JaspiraAction current = (JaspiraAction) actions.get(name);
+		addChildToMenuParentIfGiven(registeredAction);
+		addToToolbarParentIfGiven(registeredAction);
+	}
 
-		if (current == null)
+	private JaspiraAction getRegisteredAction(JaspiraAction action) {
+		JaspiraAction actionToAdd = (JaspiraAction) actions.get(action.getName());
+		return actionToAdd;
+	}
+
+	private void addToToolbarParentIfGiven(JaspiraAction action) {
+		String toolbarparentname = action.getActionPropertyString(JaspiraAction.PROPERTY_TOOLBAR_PARENT);
+
+		if (toolbarparentname == null) return;
+		
+		JaspiraAction toolbarparent = getOrCreateToolbarParent(action, toolbarparentname);
+		toolbarparent.addToolbarChild(action);
+	}
+
+	private JaspiraAction getOrCreateToolbarParent(JaspiraAction current, String toolbarparentname) {
+		JaspiraAction toolbarparent = getAction(toolbarparentname);
+		if (toolbarparent == null)
 		{
-			// Action not present yet, add to list
-			current = action;
-			actions.put(name, current);
+			// No, create it on the fly
+			toolbarparent = new JaspiraAction(current.getActionResource(), toolbarparentname);
+			addAction(toolbarparent);
 		}
+		return toolbarparent;
+	}
 
-		// Increase reference counter
-		current.increaseCounter();
-
-		// Add as child to the menu parent if given
+	private void addChildToMenuParentIfGiven(JaspiraAction current) {
 		String menuparentname = current.getActionPropertyString(JaspiraAction.PROPERTY_MENU_PARENT);
 		if (menuparentname != null)
 		{
-			// Check if the parent has already been registered
-			JaspiraAction menuparent = getAction(menuparentname);
-			if (menuparent == null)
-			{
-				menuparent = new JaspiraAction(current.getActionResource(), menuparentname);
-				addAction(menuparent);
-			}
+			JaspiraAction menuparent = getOrCreateToolbarParent(current, menuparentname);
 
 			// register this action at its parent
 			menuparent.addMenuChild(current);
 		}
+	}
 
-		// Add as child to the toolbar parent if given
-		String toolbarparentname = current.getActionPropertyString(JaspiraAction.PROPERTY_TOOLBAR_PARENT);
-		if (toolbarparentname != null)
-		{
-			// Check if the parent has already been registered
-			JaspiraAction toolbarparent = getAction(toolbarparentname);
-			if (toolbarparent == null)
-			{
-				// No, create it on the fly
-				toolbarparent = new JaspiraAction(current.getActionResource(), toolbarparentname);
-				addAction(toolbarparent);
-			}
-
-			// register this action at its parent
-			toolbarparent.addToolbarChild(current);
-		}
+	private void registerActionIfNotYetRegistered(JaspiraAction action) {
+		String name = action.getName();
+		if (!actions.containsKey(name)) 
+			actions.put(name, action);
 	}
 
 	/**
