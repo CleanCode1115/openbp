@@ -82,9 +82,10 @@
 		<module>openbp-common-swing</module>
 		<module>openbp-common-template</module>
 		<module>openbp-cockpit</module>
-		<module>openbp-jaspira</module>
+<!-- 		<module>openbp-jaspira</module>
 		<module>openbp-cockpit-installer</module>
-	</modules>
+ -->	
+ </modules>
 
 	<profiles>
 		<!--
