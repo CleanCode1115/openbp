@@ -91,7 +91,7 @@ public final class ActionMgr
 	}
 
 	private JaspiraAction getRegisteredAction(JaspiraAction action) {
-		JaspiraAction actionToAdd = (JaspiraAction) actions.get(action.getName());
+		JaspiraAction actionToAdd = getAction(action.getName());
 		return actionToAdd;
 	}
 
